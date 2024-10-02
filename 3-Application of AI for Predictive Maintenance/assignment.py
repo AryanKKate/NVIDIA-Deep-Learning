@@ -29,15 +29,21 @@ def get_model(x_train):
 
     :return:             The Keras model
     """
-    
+
     # some parameters to control model
     dp_lvl = 0.2
     regularizer_lvl = 0.002
-    
+
     strategy = tf.distribute.MirroredStrategy()
     with strategy.scope():
         # network design
         model = Sequential()
-        <<<TODO>>> # create your model here
-    
+        model.add(LSTM(128, input_shape=(x_train.shape[1], x_train.shape[2]),dropout = dp_lvl,
+                       recurrent_dropout = dp_lvl, return_sequences =  True ))
+        model.add(LSTM(128, dropout = dp_lvl,recurrent_dropout = dp_lvl, return_sequences =  False ))
+        model.add(Dense(256, activation='tanh',activity_regularizer=regularizers.l2(regularizer_lvl)))
+        model.add(Dropout (0.2))
+        model.add(Dense(128, activation='tanh',activity_regularizer=regularizers.l2(regularizer_lvl)))
+        model.add(Dense(x_train.shape[2], activation='relu',activity_regularizer=regularizers.l2(regularizer_lvl)))
+
     return model
